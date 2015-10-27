@@ -1,5 +1,7 @@
 # Submódulo de la aplicación "Periódico interactivo"
 
+![Travis](https://travis-ci.org/enpi/ProjectCC.svg?branch=master)
+
 ## Descripción
 
 Este submódulo es el correspondiente a la gestión de la base de datos, tanto de usuarios como de noticias de la aplicación.

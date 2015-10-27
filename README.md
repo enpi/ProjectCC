@@ -12,6 +12,12 @@ Dado que se va a trabajar con bases de datos es neceario elegir el modelo o mode
 
 En cuanto a la gestión de las noticias se usará MongoDB mientras que para la gestión de los usuarios se usará PostgreSQL.
 
+## Motivación
 
+A la hora de trabajar con datos es necesario realizar un correcto almacenamiento de los mismos, de manera que se mantenga la integridad y el acceso a los mismos sea lo más seguro y eficiente posible.
+
+## Objetivos a alcanzar
+
+Además de crear la aplicación el objetivo principal es crear la infraestructura virtual adecuada cumpliendo con los puntos de aprovisionamiento, integración contínua y despliegue automático. 
 
 

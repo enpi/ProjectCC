@@ -1,0 +1,5 @@
+Mako==1.0.2
+feedparser==5.2.1
+pymongo==3.0.3
+tweepy==3.4.0
+web.py==0.37

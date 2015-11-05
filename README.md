@@ -18,7 +18,7 @@ En cuanto a la gestión de las noticias se usará MongoDB mientras que para la g
 
 Además se permitirá acceder a las noticias mediante una API Rest que será diseñada usando el microframework [Flask](http://flask.pocoo.org/), de modo que estas sean devueltas en formato [JSON](http://www.json.org/).
 
-
+Para la documentación se usará [Pycco](http://fitzgen.github.io/pycco/), la versión para Python de Docco.
 
 ### Infraestructura virtual
 

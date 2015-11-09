@@ -70,6 +70,8 @@ Lo podemos enganchar sencillamente con nuestro repositorio público de Github en
 
 ##Tests con mocha
 
+![Mocha](https://i.gyazo.com/fefe14e613dcf2e9191eaffa4950c79f.png)
+
 A mocha se le puede definir como un framework de pruebas rico en características que puede ser implementado en nodejs, mocha ejecuta las pruebas en serie permitiendo reportes flexibles y exactos, haciendo que el código pasado pruebas sea óptimo al momento de estar en producción.
 
 Chai es una biblioteca de aserciones (assertion library) para NodeJS y para el navegador, que integraremos con Mocha. Chai nos ayuda a realizar aserciones contra nuestro código. Es muy completo ya que, sin necesidad de plugins, tiene 2 estilos con los que podemos realizar las aserciones: podemos optar por el estilo TDD (Test-driven development) o BDD(Behavior-Driven Development).

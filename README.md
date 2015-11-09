@@ -1,6 +1,7 @@
 # Submódulo de la aplicación "Periódico interactivo"
 
 ![Travis](https://travis-ci.org/enpi/ProjectCC.svg?branch=master)
+![Shippable](https://app.shippable.com/projects/563fafac1895ca447422f73f/badge/master)
 
 #Hito 1 - Organización de los grupos de práctica y creación del proyecto
 
@@ -38,11 +39,9 @@ A la hora de trabajar con datos es necesario realizar un correcto almacenamiento
 
 Además de desarrollar la aplicación el objetivo principal es crear la infraestructura virtual adecuada cumpliendo con los puntos de aprovisionamiento, integración contínua y despliegue automático. 
 
-#Hito 2 Infraestructura virtual de un proyecto con integración continua.
+#Hito 2 - Infraestructura virtual de un proyecto con integración continua.
 
-##Integración contínua
-
-##Shippable
+##Integración contínua con Shippable
 
 ![imagen](http://docsv2.readthedocs.org/en/latest/_static/ash/images/main-logo-inverted-hidpi.png)
 
@@ -52,7 +51,7 @@ Este servicio soporta numerosos lenguajes de programación como: Ruby, Python, J
 
 Para utilizar este tipo de integración continua ha sido necesario un archivo llamado **shippable.yml** que se encuentra en la raíz de nuestro repositorio y se va a encargar de ejecutar los test en su [web](https://www.shippable.com/). El otro archivo necesario es el llamado **requirements.txt** en el que introducimos todas las herramientas necesarias para hacer los test.
 
-##Travis
+##Integración contínua con Travis-CI
 
 ![imagen](https://travis-ci.com/img/travis-mascot-200px.png)
 

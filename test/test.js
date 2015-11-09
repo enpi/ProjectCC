@@ -7,7 +7,6 @@ var db = require('mocha-mongodb'); // Añadimos el helper de MongoDB para mocha
 
 var request = require('supertest');//Biblioteca para comprobar servidores web
 var urlServidor = "http://localhost:8080";//URL del servidor donde se ejecuta la aplicación
-var urlServidorGraficos = "http://localhost:8080/highchart";//Url de la parte de gráficas
 
 
 describe('Test basicos', function() {
@@ -24,6 +23,12 @@ describe('Test basicos', function() {
       expect('docs/pycco.css').to.be.a.file();
       done();
     });
+
+    it('Conectado a la base de datos',function(done){
+		db.connect('mongodb://localhost');
+	  	db.dropDb();
+		done();	
+	});
 
   });
 

@@ -32,7 +32,9 @@ describe('Test basicos', function() {
 
   });
 
-    describe("Example spec for a model", function() {
+});
+
+describe("Example spec for a model", function() {
   beforeEach(function(done) {
     if (mongoose.connection.db) return done();
 
@@ -79,6 +81,4 @@ describe('Test basicos', function() {
       });
     });
   });
-});
-
 });

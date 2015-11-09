@@ -18,7 +18,7 @@
     "chai": "*",
     "mocha": "*",
     "supertest": "^1.1.0",
-    "mocha-mongodb": "*"
+    "mocha-mongoose": "*"
   },
 
   "scripts": {

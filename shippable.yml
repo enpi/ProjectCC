@@ -1,0 +1,11 @@
+# Configuración del lenguaje
+language: python
+
+# Version
+python:
+   - "2.6"
+   - "2.7"
+   
+#Instalar requerimientos 
+install:
+   - pip install -r requirements.txt

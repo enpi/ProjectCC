@@ -13,7 +13,6 @@ var dbURI    = 'mongodb://localhost/demo-app-clearing-db'
 
 
 var request = require('supertest');//Biblioteca para comprobar servidores web
-var should = require("should");
 var urlServidor = "http://localhost:8080";//URL del servidor donde se ejecuta la aplicación
 
 

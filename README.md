@@ -2,6 +2,8 @@
 
 ![Travis](https://travis-ci.org/enpi/ProjectCC.svg?branch=master)
 
+#Hito 1 - Organización de los grupos de práctica y creación del proyecto
+
 ## Descripción
 
 Este submódulo es el correspondiente a la gestión de la base de datos, tanto de usuarios como de noticias de la aplicación. Será desarrollado en el lenguaje de programación Python.
@@ -36,4 +38,33 @@ A la hora de trabajar con datos es necesario realizar un correcto almacenamiento
 
 Además de desarrollar la aplicación el objetivo principal es crear la infraestructura virtual adecuada cumpliendo con los puntos de aprovisionamiento, integración contínua y despliegue automático. 
 
+#Hito 2 Infraestructura virtual de un proyecto con integración continua.
+
+##Integración contínua
+
+##Shippable
+
+![imagen](http://docsv2.readthedocs.org/en/latest/_static/ash/images/main-logo-inverted-hidpi.png)
+
+Shippable es una plataforma en la nube que nos ofrece integración continua y testeo con repositorios de Github. La integración continua con shippable se construye usando Docker.
+
+Este servicio soporta numerosos lenguajes de programación como: Ruby, Python, Java, Scala, Node.js, PHP, MySQL, Redis, PostgreSQL, Elasticsearch, Memcached, SQLite3 y MongoDB en Ubuntu. Debido a esto, hemos decidido usar Shippable, ya que se adaptaba perfectamente a nuestra aplicación y era facilmente sincronizable con Github.
+
+Para utilizar este tipo de integración continua ha sido necesario un archivo llamado **shippable.yml** que se encuentra en la raíz de nuestro repositorio y se va a encargar de ejecutar los test en su [web](https://www.shippable.com/). El otro archivo necesario es el llamado **requirements.txt** en el que introducimos todas las herramientas necesarias para hacer los test.
+
+##Travis
+
+![imagen](https://travis-ci.com/img/travis-mascot-200px.png)
+
+En desarrolllo software, Travis CI es un servicio distribuido de integración continua usado para crear y testear proyectos de GitHub.
+
+Se configura añadiendo un fichero llamado **.travis.yml**, que se trata de un fichero tipo YAML, al directorio root del repositorio de GitHub.
+
+Travis CI automáticamente detecta ( al igual que Shippable ) cuando se ha realizado un commit y push al repositorio de GitHub, y cada vez que esto ocurre, se intentará montar el proyecto y ejecutar tests sobre él.
+
+Ofrece soporte para múltiples lenguajes de programación.
+
+Una de las ventajas más claras de usar Travis CI es que el entorno de integración continua esta compuesto de multiples runtimes (Node.js, o versiones de PHP, por ejemplo) o data stores. De este modo, podemos probar nuestras librerías o aplicaciones contra distintas configuraciones sin tener que tenerlas instaladas localmente. Tienen varias maquinas virtuales preparadas para cada combinación, allí puedes instalar MySQL o lo que necesites.
+
+Lo podemos enganchar sencillamente con nuestro repositorio público de Github en un par de pasos para darle acceso de lectura a nuestro código y definir los test necesarios. Realmente la documentación está bastante bien explicada y detallada cada proceso, así como las herramientas de terceros y recursos, así como la guía de desarrolladores con la propia API de Travis CI.
 

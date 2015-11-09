@@ -67,3 +67,13 @@ Una de las ventajas más claras de usar Travis CI es que el entorno de integraci
 
 Lo podemos enganchar sencillamente con nuestro repositorio público de Github en un par de pasos para darle acceso de lectura a nuestro código y definir los test necesarios. Realmente la documentación está bastante bien explicada y detallada cada proceso, así como las herramientas de terceros y recursos, así como la guía de desarrolladores con la propia API de Travis CI.
 
+
+##Tests con unittest y mocha
+
+A mocha se le puede definir como un framework de pruebas rico en características que puede ser implementado en nodejs, mocha ejecuta las pruebas en serie permitiendo reportes flexibles y exactos, haciendo que el código pasado pruebas sea óptimo al momento de estar en producción.
+
+Chai es una biblioteca de aserciones (assertion library) para NodeJS y para el navegador, que integraremos con Mocha. Chai nos ayuda a realizar aserciones contra nuestro código. Es muy completo ya que, sin necesidad de plugins, y tiene 2 estilos con los que podemos realizar las aserciones: podemos optar por el estilo TDD (Test-driven development) o BDD(Behavior-Driven Development).
+
+Supertest es otra librería para hacer aserciones HTTP. Permite hacer pruebas HTTP de alto nivel y así poder compobar el funcionamiento de nuestro servidor. Los test con Supertest los haremos sólo en local, ya que no podemos desplegar el servidor en Travis para que realice los test.
+
+

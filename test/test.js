@@ -12,12 +12,8 @@ var dbURI    = 'mongodb://localhost/demo-app-clearing-db'
 ;
 
 
-var dbURI    = 'mongodb://localhost/demo-app-clearing-db'
-  , should   = require('chai').should()
-  , mongoose = require('mongoose')
-;
-
 var request = require('supertest');//Biblioteca para comprobar servidores web
+var should = require("should");
 var urlServidor = "http://localhost:8080";//URL del servidor donde se ejecuta la aplicación
 
 
@@ -40,8 +36,7 @@ describe('Test basicos', function() {
 
 });
 
-
-
+/**
 describe('Tests de conectividad de la página', function(){
 
 	it('Se carga la página principal', function(done){
@@ -54,6 +49,7 @@ describe('Tests de conectividad de la página', function(){
 	})
 
 });
+**/
 
 describe("Pruebas con bases de datos de test", function() {
   beforeEach(function(done) {

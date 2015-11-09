@@ -3,7 +3,7 @@ var assert = require('assert');
 var chai = require('chai');//Añado mocha
 var expect = chai.expect;
 chai.use(require('chai-fs'));
-var mongo = require('mocha-mongo')('mongodb://localhost');; // Añadimos el helper de MongoDB para mocha
+var mongo = require('mocha-mongodb')('mongodb://localhost');; // Añadimos el helper de MongoDB para mocha
 var ready = mongo.ready();
 
 var request = require('supertest');//Biblioteca para comprobar servidores web

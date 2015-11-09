@@ -1,0 +1,22 @@
+{
+  "name": "ProyectCC-PeriodicoInteractivo",
+
+  "version": "0.0.1",
+
+  "author": "enpi",
+
+  "description": "Proyecto de MII en Granada: Periódico web interactivo",
+
+  "keywords": ["CC, periodico"],
+
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*",
+    "supertest": "^1.1.0",
+    "mocha-mongodb": "*"
+  },
+
+  "scripts": {
+    "test": "mocha"
+  }
+}

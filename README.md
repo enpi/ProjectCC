@@ -97,5 +97,5 @@ services:
 	-mongodb
 ```
 
-
+Los tests creados permitan comprobar la existencia de determinados ficheros en los directorios y pruebas de conexión a una base de datos de test con inserción, listado y borrado de la misma.
 

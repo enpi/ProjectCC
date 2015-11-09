@@ -11,6 +11,12 @@ var dbURI    = 'mongodb://localhost/demo-app-clearing-db'
   , clearDB  = require('mocha-mongoose')(dbURI)
 ;
 
+
+var dbURI    = 'mongodb://localhost/demo-app-clearing-db'
+  , should   = require('chai').should()
+  , mongoose = require('mongoose')
+;
+
 var request = require('supertest');//Biblioteca para comprobar servidores web
 var urlServidor = "http://localhost:8080";//URL del servidor donde se ejecuta la aplicación
 
@@ -34,18 +40,18 @@ describe('Test basicos', function() {
 
 });
 
-describe("Example spec for a model", function() {
+describe("Pruebas con bases de datos de test", function() {
   beforeEach(function(done) {
     if (mongoose.connection.db) return done();
 
     mongoose.connect(dbURI, done);
   });
 
-  it("can be saved", function(done) {
+  it("Se puede almacenar datos", function(done) {
     new Dummy({a: 1}).save(done);
   });
 
-  it("can be listed", function(done) {
+  it("Se pueden mostrar datos", function(done) {
     new Dummy({a: 1}).save(function(err, model){
       if (err) return done(err);
 
@@ -63,7 +69,7 @@ describe("Example spec for a model", function() {
     });
   });
 
-  it("can clear the DB on demand", function(done) {
+  it("Se puede borrar la base de datos", function(done) {
     new Dummy({a: 5}).save(function(err, model){
       if (err) return done(err);
 

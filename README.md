@@ -6,7 +6,7 @@
 
 Este submódulo es el correspondiente a la gestión de la base de datos, tanto de usuarios como de noticias de la aplicación. Será desarrollado en el lenguaje de programación Python.
 
-El proyecto está bajo la licencia [GNU General Public License](https://github.com/enpi/ProjectCC/blob/master/LICENSE.md) y será desarrollado por [Hans-Manuel Grenner Noguerón](https://github.com/enpi).
+El proyecto está bajo la licencia [GNU General Public License](https://github.com/enpi/ProjectCC/blob/master/LICENSE) y será desarrollado por [Hans-Manuel Grenner Noguerón](https://github.com/enpi).
 
 ## Herramientas usadas
 
@@ -15,6 +15,10 @@ El proyecto está bajo la licencia [GNU General Public License](https://github.c
 Dado que se va a trabajar con bases de datos es neceario elegir el modelo o modelos que nos interesan. En un principio se van a usar tanto bases de datos relacionales como es el caso de [PostgreSQL](http://www.postgresql.org/) con su correspondiente adaptador para Python para facilitar la integración ( [Psycopg](http://initd.org/psycopg/) ) y bases de datos no relacionales como [MongoDB](https://www.mongodb.org/) mediante [PyMongo](https://api.mongodb.org/python/current/).
 
 En cuanto a la gestión de las noticias se usará MongoDB mientras que para la gestión de los usuarios se usará PostgreSQL.
+
+Además se permitirá acceder a las noticias mediante una API Rest que será diseñada usando el microframework [Flask](http://flask.pocoo.org/), de modo que estas sean devueltas en formato [JSON](http://www.json.org/).
+
+Para la documentación se usará [Pycco](http://fitzgen.github.io/pycco/), la versión para Python de Docco.
 
 ### Infraestructura virtual
 

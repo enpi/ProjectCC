@@ -40,6 +40,21 @@ describe('Test basicos', function() {
 
 });
 
+
+
+describe('Tests de conectividad de la página', function(){
+
+	it('Se carga la página principal', function(done){
+	
+	request('http://localhost:8080');
+	request.get('/').expect(200,function(err){
+		console.log(err);	
+	});
+	done();
+	})
+
+});
+
 describe("Pruebas con bases de datos de test", function() {
   beforeEach(function(done) {
     if (mongoose.connection.db) return done();

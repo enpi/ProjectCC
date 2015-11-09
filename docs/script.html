@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>script.py</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id="background"></div>
+<div id='container'>
+  <div class='section'>
+    <div class='docs'><h1>script.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">web</span>
+<span class="kn">from</span> <span class="nn">web</span> <span class="kn">import</span> <span class="n">form</span>
+<span class="kn">from</span> <span class="nn">web.contrib.template</span> <span class="kn">import</span> <span class="n">render_mako</span>
+<span class="kn">from</span> <span class="nn">pymongo</span> <span class="kn">import</span> <span class="n">MongoClient</span>
+<span class="kn">import</span> <span class="nn">feedparser</span>
+<span class="kn">import</span> <span class="nn">tweepy</span>
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+
+<span class="n">web</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">debug</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="n">urls</span> <span class="o">=</span> <span class="p">(</span> <span class="s">&#39;/logout&#39;</span><span class="p">,</span> <span class="s">&#39;logout&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/registro&#39;</span><span class="p">,</span> <span class="s">&#39;registro&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/ver_perfil&#39;</span><span class="p">,</span> <span class="s">&#39;ver_perfil&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/editar_perfil&#39;</span><span class="p">,</span> <span class="s">&#39;editar_perfil&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/mas_visitadas&#39;</span><span class="p">,</span> <span class="s">&#39;mas_visitadas&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/rss&#39;</span><span class="p">,</span> <span class="s">&#39;rss&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/highchart&#39;</span><span class="p">,</span> <span class="s">&#39;highchart&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/mapa&#39;</span><span class="p">,</span> <span class="s">&#39;mapa&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/twitter&#39;</span><span class="p">,</span> <span class="s">&#39;twitter&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/eventos_twitter&#39;</span><span class="p">,</span> <span class="s">&#39;eventos_twitter&#39;</span><span class="p">,</span>
+        <span class="s">&#39;/(.*)&#39;</span><span class="p">,</span> <span class="s">&#39;login&#39;</span> 
+    <span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>Consumer keys and access tokens, used for OAuth</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">consumer_key</span> <span class="o">=</span> <span class="s">&#39;UbeG6c5YaR1a7gZYdLqqr7fFN&#39;</span>
+<span class="n">consumer_secret</span> <span class="o">=</span> <span class="s">&#39;BTrE1bbvDz6SuxKxlKF1mHof955YheUjb7gzGoLk590fF4BpIQ&#39;</span>
+<span class="n">access_token</span> <span class="o">=</span> <span class="s">&#39;519720537-MsyxcBoaLUES8U0ECtzinEQ9ivbTMRO4CHBLtk98&#39;</span>
+<span class="n">access_token_secret</span> <span class="o">=</span> <span class="s">&#39;XEhkECGK0z0uVuj9XfC1tMOeZxeSCvdReBzPxTyR1uEDS&#39;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>OAuth process, using the keys and tokens</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">auth</span> <span class="o">=</span> <span class="n">tweepy</span><span class="o">.</span><span class="n">OAuthHandler</span><span class="p">(</span><span class="n">consumer_key</span><span class="p">,</span> <span class="n">consumer_secret</span><span class="p">)</span>
+<span class="n">auth</span><span class="o">.</span><span class="n">set_access_token</span><span class="p">(</span><span class="n">access_token</span><span class="p">,</span> <span class="n">access_token_secret</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>Creation of the actual interface, using authentication</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">api</span> <span class="o">=</span> <span class="n">tweepy</span><span class="o">.</span><span class="n">API</span><span class="p">(</span><span class="n">auth</span><span class="p">)</span>
+
+
+<span class="n">feed</span><span class="o">=</span> <span class="n">feedparser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s">&#39;portada_elpais.xml&#39;</span><span class="p">)</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">web</span><span class="o">.</span><span class="n">application</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="nb">globals</span><span class="p">(),</span> <span class="n">autoreload</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="n">plantillas</span> <span class="o">=</span> <span class="n">render_mako</span><span class="p">(</span>
+        <span class="n">directories</span><span class="o">=</span><span class="p">[</span><span class="s">&#39;templates&#39;</span><span class="p">],</span>
+        <span class="n">input_encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">,</span>
+        <span class="n">output_encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span>
+        <span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>Conexión a la base de datos</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">try</span><span class="p">:</span>
+    <span class="n">client</span> <span class="o">=</span> <span class="n">MongoClient</span><span class="p">()</span>
+    <span class="n">db</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">usuarios</span>
+    <span class="k">print</span> <span class="s">&quot;Conexión realizada con éxito&quot;</span>
+<span class="k">except</span> <span class="n">pymongo</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">ConnectionFailure</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;Error al conectar con MongoDB: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">e</span>
+
+
+<span class="n">dias</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">meses</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">13</span><span class="p">)</span>
+<span class="n">anios</span><span class="o">=</span><span class="nb">range</span><span class="p">(</span><span class="mi">1915</span><span class="p">,</span><span class="mi">2015</span><span class="p">)</span>
+
+<span class="n">form_reg</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Nombre de Usuario&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;nombre&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="s">&#39;^[A-Z, a-z]&#39;</span><span class="p">,</span> <span class="s">&#39;No hay nadie en el mundo cuyo nombre tenga números.¡Use letras!&#39;</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Nombre&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;apellidos&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="s">&#39;^[A-Z, a-z]&#39;</span><span class="p">,</span> <span class="s">&#39;No hay nadie en el mundo cuyo apellido tenga números.¡Use letras!&#39;</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Apellido&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;correo&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span>  <span class="n">form</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="s">&#39;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$&#39;</span><span class="p">,</span> <span class="s">&#39;Introduzca un correo válido&#39;</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Correo electrónico&quot;</span><span class="p">),</span>
+
+    <span class="n">form</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="s">&#39;dias&#39;</span><span class="p">,</span> <span class="n">dias</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Dia&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="s">&#39;meses&#39;</span><span class="p">,</span> <span class="n">meses</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Mes&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="s">&#39;anios&#39;</span><span class="p">,</span> <span class="n">anios</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Anio&quot;</span><span class="p">),</span>
+
+    <span class="n">form</span><span class="o">.</span><span class="n">Textarea</span><span class="p">(</span><span class="s">&#39;direccion&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span>  <span class="n">description</span><span class="o">=</span><span class="s">&quot;Dirección&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Password</span><span class="p">(</span><span class="s">&#39;clave&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Contraseña&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Password</span><span class="p">(</span><span class="s">&#39;clave2&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Repetir contraseña&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Radio</span><span class="p">(</span><span class="s">&#39;pago&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;Contra reembolso&#39;</span><span class="p">,</span> <span class="s">&#39;Tarjeta VISA&#39;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Forma de pago&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;visa&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="s">&#39;((\d{4})[\-,\s](\d{4})[\-,\s](\d{4})[\-,\s](\d{4}))&#39;</span><span class="p">,</span> <span class="s">&#39;Introduzca un número de tarjeta VISA válido&#39;</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Tarjeta VISA&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Checkbox</span><span class="p">(</span><span class="s">&#39;clausula&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&quot;Acepta las clausulas&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">==</span> <span class="s">&#39;true&#39;</span><span class="p">),</span> <span class="n">value</span><span class="o">=</span><span class="s">&#39;true&#39;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;¿Nos vende su alma?&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s">&#39;Registrarse&#39;</span><span class="p">),</span>
+    <span class="n">validators</span> <span class="o">=</span> <span class="p">[</span><span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&quot;Fecha de nacimiento no válida.&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="p">(((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dias</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">28</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">anios</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dias</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">29</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">anios</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)))</span> <span class="ow">or</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dias</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">31</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">7</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span><span class="p">)))</span> <span class="ow">or</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dias</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">30</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">9</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">11</span><span class="p">))))),</span> <span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&quot;Las contraseñas no coinciden.&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">clave</span> <span class="o">==</span> <span class="n">i</span><span class="o">.</span><span class="n">clave2</span><span class="p">),</span>  <span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&#39;Míninmo 7 caracteres&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">clave</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">7</span><span class="p">),</span> <span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&#39;Míninmo 7 caracteres&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">clave2</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">7</span><span class="p">)]</span>
+
+<span class="p">)</span>
+
+<span class="n">form_log</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;usuario&#39;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Password</span><span class="p">(</span><span class="s">&#39;contrasenia&#39;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s">&#39;Login&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">form_twitter_palabra</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;twitter_palabra&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Palabra&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;num_resultados&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Numero de resultados&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s">&#39;Buscar&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">form_twitter_usuario</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;usuario&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Nombre de Usuario&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;num_resultados&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Numero de resultados&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s">&#39;Buscar&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">form_twitter_eventos</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;twitter_palabra&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;texto_evento&quot;</span><span class="p">),</span>
+    <span class="n">form</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s">&#39;Buscar&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s">&quot;boton_evento&quot;</span><span class="p">)</span>
+<span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">registro</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">form_reg</span><span class="p">()</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina3&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina2</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina2&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina1</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina1&#39;</span><span class="p">,</span> <span class="s">&quot;registro&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_registro_conectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">registro</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">()</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_registro_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">registro</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">render</span><span class="p">())</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">POST</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">form_reg</span><span class="p">()</span>
+        <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+        <span class="n">res</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">r</span><span class="o">.</span><span class="n">validates</span><span class="p">():</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span> 
+                <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_registro_conectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">registro</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_registro_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">registro</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="n">post</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+                    <span class="s">&quot;nombre&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">nombre</span><span class="p">,</span>
+                    <span class="s">&quot;apellidos&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">apellidos</span><span class="p">,</span>
+                    <span class="s">&quot;correo&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">correo</span><span class="p">,</span>
+                    <span class="s">&quot;dia&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">dias</span><span class="p">,</span>
+                    <span class="s">&quot;mes&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">meses</span><span class="p">,</span>
+                    <span class="s">&quot;anio&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">anios</span><span class="p">,</span>
+                    <span class="s">&quot;direccion&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">direccion</span><span class="p">,</span>
+                    <span class="s">&quot;password&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">clave</span><span class="p">,</span>
+                    <span class="s">&quot;pago&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">pago</span><span class="p">,</span>
+                    <span class="s">&quot;visa&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">visa</span><span class="p">,</span>
+                    <span class="p">}</span>
+
+            <span class="n">posts</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">posts</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">posts</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&quot;user&quot;</span><span class="p">:</span><span class="n">r</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">user</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> 
+                <span class="n">post_id</span> <span class="o">=</span> <span class="n">posts</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>           
+                <span class="n">mensaje</span> <span class="o">=</span> <span class="s">&quot;Enhorabuena te has registrado con exito.&quot;</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span> 
+                    <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_registro_conectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">registro</span><span class="o">=</span><span class="n">mensaje</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_registro_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">registro</span><span class="o">=</span><span class="n">mensaje</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mensaje</span><span class="o">=</span><span class="n">r</span><span class="o">.</span><span class="n">render</span><span class="p">()</span><span class="o">+</span><span class="s">&quot;Ya existe un usuario con ese nombre de usuario.&quot;</span>
+                <span class="k">try</span><span class="p">:</span> 
+                    <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_registro_conectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">registro</span><span class="o">=</span><span class="n">mensaje</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_registro_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">registro</span><span class="o">=</span><span class="n">mensaje</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">login</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina3&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina2</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina2&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina1</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina1&#39;</span><span class="p">,</span> <span class="s">&quot;login&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_conectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">mensaje</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+        	<span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+        	<span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+        	<span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">POST</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">):</span>
+        <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">validates</span><span class="p">():</span>
+            <span class="n">posts</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">posts</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">posts</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&quot;user&quot;</span><span class="p">:</span><span class="n">l</span><span class="p">[</span><span class="s">&#39;usuario&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">})</span>
+            <span class="k">if</span> <span class="n">query</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">usuario</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;user&quot;</span><span class="p">]</span>
+                <span class="n">password</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;password&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">password</span> <span class="o">!=</span> <span class="n">l</span><span class="p">[</span><span class="s">&#39;contrasenia&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Contrasenia incorrecta.&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">,</span> <span class="n">usuario</span><span class="p">)</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina1&#39;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina2&#39;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina3&#39;</span><span class="p">,</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+                    <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">usuario</span><span class="p">)</span>
+                    <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_conectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">mensaje</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Usuario incorrecto.&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">logout</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="o">-</span><span class="mi">3600</span><span class="p">)</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina1&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3600</span><span class="p">)</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina2&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina2</span><span class="p">,</span> <span class="o">-</span><span class="mi">3600</span><span class="p">)</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina3&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina3</span><span class="p">,</span> <span class="o">-</span><span class="mi">3600</span><span class="p">)</span>
+        <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">ver_perfil</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">posts</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">posts</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">posts</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&quot;user&quot;</span><span class="p">:</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">})</span>
+            <span class="n">usuario1</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;user&quot;</span><span class="p">]</span>
+            <span class="n">password1</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;password&quot;</span><span class="p">]</span>
+            <span class="n">nombre1</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;nombre&quot;</span><span class="p">]</span>
+            <span class="n">apellidos1</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;apellidos&quot;</span><span class="p">]</span>
+            <span class="n">correo1</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;correo&quot;</span><span class="p">]</span>
+            <span class="n">dia1</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;dia&quot;</span><span class="p">]</span>
+            <span class="n">mes1</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;mes&quot;</span><span class="p">]</span>
+            <span class="n">anio1</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;anio&quot;</span><span class="p">]</span>
+            <span class="n">direccion1</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;direccion&quot;</span><span class="p">]</span>
+            <span class="n">pago1</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;pago&quot;</span><span class="p">]</span>
+            <span class="n">visa1</span> <span class="o">=</span> <span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;visa&quot;</span><span class="p">]</span>
+            <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">usuario1</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina3&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina2</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina2&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina1</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina1&#39;</span><span class="p">,</span> <span class="s">&quot;ver_perfil&quot;</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">datos_perfil</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">usuario</span> <span class="o">=</span> <span class="n">usuario1</span><span class="p">,</span> <span class="n">password</span> <span class="o">=</span> <span class="n">password1</span><span class="p">,</span> <span class="n">nombre</span><span class="o">=</span> <span class="n">nombre1</span><span class="p">,</span> <span class="n">apellidos</span><span class="o">=</span><span class="n">apellidos1</span><span class="p">,</span> <span class="n">correo</span><span class="o">=</span><span class="n">correo1</span><span class="p">,</span> <span class="n">dia</span><span class="o">=</span><span class="n">dia1</span><span class="p">,</span> <span class="n">mes</span><span class="o">=</span><span class="n">mes1</span><span class="p">,</span> <span class="n">anio</span><span class="o">=</span><span class="n">anio1</span><span class="p">,</span> <span class="n">direccion</span><span class="o">=</span><span class="n">direccion1</span><span class="p">,</span> <span class="n">pago</span><span class="o">=</span><span class="n">pago1</span><span class="p">,</span> <span class="n">visa</span><span class="o">=</span><span class="n">visa1</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Se ha producido algun error. Inicie sesion de nuevo.&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">editar_perfil</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">posts</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">posts</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">posts</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&quot;user&quot;</span><span class="p">:</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">})</span>
+            <span class="n">form_reg_editar</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;nombre&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="s">&#39;^[A-Z, a-z]&#39;</span><span class="p">,</span> <span class="s">&#39;No hay nadie en el mundo cuyo nombre tenga números.¡Use letras!&#39;</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Nombre&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;nombre&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;apellidos&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="s">&#39;^[A-Z, a-z]&#39;</span><span class="p">,</span> <span class="s">&#39;No hay nadie en el mundo cuyo apellido tenga números.¡Use letras!&#39;</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Apellido&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;apellidos&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;correo&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span>  <span class="n">form</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="s">&#39;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$&#39;</span><span class="p">,</span> <span class="s">&#39;Introduzca un correo válido&#39;</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Correo electrónico&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;correo&quot;</span><span class="p">]),</span>
+
+                <span class="n">form</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="s">&#39;dias&#39;</span><span class="p">,</span> <span class="n">dias</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Dia&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;dia&quot;</span><span class="p">])),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="s">&#39;meses&#39;</span><span class="p">,</span> <span class="n">meses</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Mes&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;mes&quot;</span><span class="p">])),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="s">&#39;anios&#39;</span><span class="p">,</span> <span class="n">anios</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Anio&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;anio&quot;</span><span class="p">])),</span>
+
+                <span class="n">form</span><span class="o">.</span><span class="n">Textarea</span><span class="p">(</span><span class="s">&#39;direccion&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span>  <span class="n">description</span><span class="o">=</span><span class="s">&quot;Dirección&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;direccion&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Password</span><span class="p">(</span><span class="s">&#39;clave&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Contraseña&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;password&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Password</span><span class="p">(</span><span class="s">&#39;clave2&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Repetir contraseña&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;password&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Radio</span><span class="p">(</span><span class="s">&#39;pago&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;Contra reembolso&#39;</span><span class="p">,</span> <span class="s">&#39;Tarjeta VISA&#39;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Forma de pago&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;pago&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;visa&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="s">&#39;((\d{4})[\-,\s](\d{4})[\-,\s](\d{4})[\-,\s](\d{4}))&#39;</span><span class="p">,</span> <span class="s">&#39;Introduzca un número de tarjeta VISA válido&#39;</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Tarjeta VISA&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;visa&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s">&#39;Editar&#39;</span><span class="p">),</span>
+                <span class="n">validators</span> <span class="o">=</span> <span class="p">[</span><span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&quot;Fecha de nacimiento no válida.&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="p">(((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dias</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">28</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">anios</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dias</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">29</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">anios</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)))</span> <span class="ow">or</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dias</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">31</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">7</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span><span class="p">)))</span> <span class="ow">or</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dias</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">30</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">9</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">11</span><span class="p">))))),</span> <span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&quot;Las contraseñas no coinciden.&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">clave</span> <span class="o">==</span> <span class="n">i</span><span class="o">.</span><span class="n">clave2</span><span class="p">),</span>  <span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&#39;Míninmo 7 caracteres&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">clave</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">7</span><span class="p">),</span> <span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&#39;Míninmo 7 caracteres&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">clave2</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">7</span><span class="p">)]</span>
+            <span class="p">)</span>
+            <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina3&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina2</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina2&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina1</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina1&#39;</span><span class="p">,</span> <span class="s">&quot;editar_perfil&quot;</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">editar_perfil</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">registro</span><span class="o">=</span><span class="n">form_reg_editar</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Se ha producido algun error. Inicie sesion de nuevo.&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">POST</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">posts</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">posts</span>
+            <span class="n">query</span><span class="o">=</span><span class="n">posts</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&quot;user&quot;</span><span class="p">:</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">})</span>
+            <span class="n">form_reg_editar</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">Form</span><span class="p">(</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;nombre&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="s">&#39;^[A-Z, a-z]&#39;</span><span class="p">,</span> <span class="s">&#39;No hay nadie en el mundo cuyo nombre tenga números.¡Use letras!&#39;</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Nombre&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;nombre&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;apellidos&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="s">&#39;^[A-Z, a-z]&#39;</span><span class="p">,</span> <span class="s">&#39;No hay nadie en el mundo cuyo apellido tenga números.¡Use letras!&#39;</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Apellido&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;apellidos&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;correo&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span>  <span class="n">form</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="s">&#39;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$&#39;</span><span class="p">,</span> <span class="s">&#39;Introduzca un correo válido&#39;</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Correo electrónico&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;correo&quot;</span><span class="p">]),</span>
+
+                <span class="n">form</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="s">&#39;dias&#39;</span><span class="p">,</span> <span class="n">dias</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Dia&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;dia&quot;</span><span class="p">])),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="s">&#39;meses&#39;</span><span class="p">,</span> <span class="n">meses</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Mes&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;mes&quot;</span><span class="p">])),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="s">&#39;anios&#39;</span><span class="p">,</span> <span class="n">anios</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Anio&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;anio&quot;</span><span class="p">])),</span>
+
+                <span class="n">form</span><span class="o">.</span><span class="n">Textarea</span><span class="p">(</span><span class="s">&#39;direccion&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span>  <span class="n">description</span><span class="o">=</span><span class="s">&quot;Dirección&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;direccion&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Password</span><span class="p">(</span><span class="s">&#39;clave&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Contraseña&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;password&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Password</span><span class="p">(</span><span class="s">&#39;clave2&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">notnull</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Repetir contraseña&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;password&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Radio</span><span class="p">(</span><span class="s">&#39;pago&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;Contra reembolso&#39;</span><span class="p">,</span> <span class="s">&#39;Tarjeta VISA&#39;</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Forma de pago&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;pago&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Textbox</span><span class="p">(</span><span class="s">&#39;visa&#39;</span><span class="p">,</span> <span class="n">form</span><span class="o">.</span><span class="n">regexp</span><span class="p">(</span><span class="s">&#39;((\d{4})[\-,\s](\d{4})[\-,\s](\d{4})[\-,\s](\d{4}))&#39;</span><span class="p">,</span> <span class="s">&#39;Introduzca un número de tarjeta VISA válido&#39;</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s">&quot;Tarjeta VISA&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">query</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">&quot;visa&quot;</span><span class="p">]),</span>
+                <span class="n">form</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s">&#39;Editar&#39;</span><span class="p">),</span>
+                <span class="n">validators</span> <span class="o">=</span> <span class="p">[</span><span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&quot;Fecha de nacimiento no válida.&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="p">(((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span> <span class="ow">and</span>  <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dias</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">28</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">anios</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dias</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">29</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">anios</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)))</span> <span class="ow">or</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dias</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">31</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">5</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">7</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">8</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">10</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span><span class="p">)))</span> <span class="ow">or</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">dias</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">30</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">6</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">9</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">meses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">11</span><span class="p">))))),</span> <span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&quot;Las contraseñas no coinciden.&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">clave</span> <span class="o">==</span> <span class="n">i</span><span class="o">.</span><span class="n">clave2</span><span class="p">),</span>  <span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&#39;Míninmo 7 caracteres&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">clave</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">7</span><span class="p">),</span> <span class="n">form</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="s">&#39;Míninmo 7 caracteres&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">clave2</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">7</span><span class="p">)]</span>
+            <span class="p">)</span>
+            <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">form_reg_editar</span><span class="o">.</span><span class="n">validates</span><span class="p">():</span>
+                <span class="n">posts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span> <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;nombre&quot;</span><span class="p">:</span> <span class="n">form_reg_editar</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">nombre</span><span class="p">}})</span>
+                <span class="n">posts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span> <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;apellidos&quot;</span><span class="p">:</span> <span class="n">form_reg_editar</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">apellidos</span><span class="p">}})</span>
+                <span class="n">posts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span> <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;correo&quot;</span><span class="p">:</span> <span class="n">form_reg_editar</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">correo</span><span class="p">}})</span>
+                <span class="n">posts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span> <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;dia&quot;</span> <span class="p">:</span> <span class="n">form_reg_editar</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">dias</span><span class="p">}})</span>
+                <span class="n">posts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span> <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;mes&quot;</span> <span class="p">:</span> <span class="n">form_reg_editar</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">meses</span><span class="p">}})</span>
+                <span class="n">posts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span> <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;anio&quot;</span> <span class="p">:</span> <span class="n">form_reg_editar</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">anios</span><span class="p">}})</span>
+                <span class="n">posts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span> <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;direccion&quot;</span><span class="p">:</span> <span class="n">form_reg_editar</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">direccion</span><span class="p">}})</span>
+                <span class="n">posts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span> <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;password&quot;</span> <span class="p">:</span> <span class="n">form_reg_editar</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">clave</span><span class="p">}})</span>
+                <span class="n">posts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span> <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;pago&quot;</span> <span class="p">:</span> <span class="n">form_reg_editar</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">pago</span><span class="p">}})</span>
+                <span class="n">posts</span><span class="o">.</span><span class="n">update</span><span class="p">(</span> <span class="p">{</span> <span class="s">&quot;user&quot;</span><span class="p">:</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span> <span class="p">},</span> <span class="p">{</span> <span class="s">&#39;$set&#39;</span><span class="p">:</span> <span class="p">{</span> <span class="s">&quot;visa&quot;</span> <span class="p">:</span> <span class="n">form_reg_editar</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">visa</span><span class="p">}})</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">editar_perfil</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">registro</span><span class="o">=</span><span class="s">&quot;Cambios realizados correctamente.&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">editar_perfil</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">registro</span><span class="o">=</span><span class="n">form_reg_editar</span><span class="o">.</span><span class="n">render</span><span class="p">())</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Se ha producido algun error. Inicie sesion de nuevo.&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-18'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-18'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">mas_visitadas</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-19'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-19'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">mas_visitadas</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">pagina1</span><span class="o">=</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina1</span><span class="p">,</span> <span class="n">pagina2</span><span class="o">=</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina2</span><span class="p">,</span> <span class="n">pagina3</span><span class="o">=</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina3</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Se ha producido algun error. Inicie sesion de nuevo.&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-20'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-20'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">rss</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-21'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-21'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina3&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina2</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina2&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina1</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina1&#39;</span><span class="p">,</span> <span class="s">&quot;rss&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">rss_conectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">feed</span><span class="o">=</span><span class="n">feed</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Se ha producido algun error. Inicie sesion de nuevo.&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-22'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-22'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">highchart</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-23'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-23'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina3&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina2</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina2&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina1</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina1&#39;</span><span class="p">,</span> <span class="s">&quot;highchart&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">highchart</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Se ha producido algun error. Inicie sesion de nuevo.&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-24'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-24'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">mapa</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-25'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-25'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">res</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+        <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span> 
+            <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina3&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina2</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina2&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina1</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina1&#39;</span><span class="p">,</span> <span class="s">&quot;mapa&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">mapa</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Se ha producido algun error. Inicie sesion de nuevo.&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-26'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-26'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">twitter</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-27'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-27'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">form_twitter_palabra</span><span class="p">();</span>
+            <span class="n">l2</span> <span class="o">=</span> <span class="n">form_twitter_usuario</span><span class="p">();</span>
+            <span class="n">base_datos</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+            <span class="n">rt_medio</span><span class="o">=</span><span class="mi">0</span>
+            <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina3&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina2</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina2&#39;</span><span class="p">,</span> <span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">pagina1</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">setcookie</span><span class="p">(</span><span class="s">&#39;pagina1&#39;</span><span class="p">,</span> <span class="s">&quot;twitter&quot;</span><span class="p">)</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">twitter</span><span class="p">(</span><span class="n">base_datos</span><span class="o">=</span><span class="n">base_datos</span><span class="p">,</span> <span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">form_twitter</span><span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">form_twitter2</span><span class="o">=</span><span class="n">l2</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje_busqueda</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">tweets</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">rt_medio</span><span class="o">=</span><span class="n">rt_medio</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Se ha producido algun error. Inicie sesion de nuevo.&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-28'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-28'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">POST</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">form_twitter_palabra</span><span class="p">();</span>
+            <span class="n">l2</span> <span class="o">=</span> <span class="n">form_twitter_usuario</span><span class="p">();</span>
+            <span class="n">base_datos</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+            <span class="n">res</span><span class="o">=</span><span class="s">&quot;Bienvenido usuario: </span><span class="si">%s</span><span class="s"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">web</span><span class="o">.</span><span class="n">cookies</span><span class="p">()</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+            <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;&quot;</span>
+            <span class="n">rt_medio</span><span class="o">=</span><span class="mi">0</span>
+            <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">validates</span><span class="p">():</span>
+                <span class="n">tweets</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">twitter_palabra</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">num_resultados</span><span class="p">)</span>
+                <span class="n">tweets2</span> <span class="o">=</span> <span class="n">tweets</span>
+                <span class="n">posts</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">posts</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tweets</span><span class="p">)):</span>
+                    <span class="n">rt_medio</span><span class="o">+=</span><span class="nb">int</span><span class="p">(</span><span class="n">tweets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">retweet_count</span><span class="p">)</span>
+
+                <span class="n">rt_medio</span><span class="o">=</span><span class="n">rt_medio</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">tweets</span><span class="p">)</span>
+                <span class="n">post</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;palabra&quot;</span><span class="p">:</span> <span class="n">l</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">twitter_palabra</span><span class="p">,</span>
+                        <span class="s">&quot;retweet_medio&quot;</span> <span class="p">:</span> <span class="n">rt_medio</span>
+                <span class="p">}</span>
+                <span class="n">post_id</span> <span class="o">=</span> <span class="n">posts</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">post</span><span class="p">)</span>   
+                <span class="n">posts</span><span class="o">=</span><span class="n">db</span><span class="o">.</span><span class="n">posts</span>
+                <span class="n">base_datos</span><span class="o">=</span><span class="n">posts</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s">&quot;palabra&quot;</span><span class="p">:</span><span class="n">l</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">twitter_palabra</span><span class="p">})</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+                <span class="n">mensaje</span> <span class="o">=</span> <span class="s">&quot;Ultimos </span><span class="si">%s</span><span class="s"> tweets que incluyen la palabra &#39;</span><span class="si">%s</span><span class="s">&#39; :&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">l</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">num_resultados</span><span class="p">,</span> <span class="n">l</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">twitter_palabra</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">twitter</span><span class="p">(</span><span class="n">base_datos</span><span class="o">=</span><span class="n">base_datos</span><span class="p">,</span> <span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">form_twitter</span><span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">form_twitter2</span><span class="o">=</span><span class="n">l2</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje_busqueda</span><span class="o">=</span><span class="n">mensaje</span><span class="p">,</span> <span class="n">tweets</span><span class="o">=</span><span class="n">tweets</span><span class="p">,</span> <span class="n">rt_medio</span><span class="o">=</span><span class="n">rt_medio</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">l2</span><span class="o">.</span><span class="n">validates</span><span class="p">():</span>
+                <span class="n">tweets</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">user_timeline</span><span class="p">(</span><span class="n">screen_name</span> <span class="o">=</span> <span class="n">l2</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">usuario</span><span class="p">,</span> <span class="n">include_rts</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">result_type</span> <span class="o">=</span> <span class="s">&quot;recent&quot;</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="n">l2</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">num_resultados</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tweets</span><span class="p">)):</span>
+                    <span class="n">rt_medio</span><span class="o">+=</span><span class="nb">int</span><span class="p">(</span><span class="n">tweets</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">retweet_count</span><span class="p">)</span>
+
+                <span class="n">rt_medio</span><span class="o">=</span><span class="n">rt_medio</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">tweets</span><span class="p">)</span>
+                <span class="n">mensaje</span> <span class="o">=</span> <span class="s">&quot;Ultimos </span><span class="si">%s</span><span class="s"> tweets del usuario &#39;</span><span class="si">%s</span><span class="s">&#39; :&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">l2</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">num_resultados</span><span class="p">,</span> <span class="n">l2</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">usuario</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">twitter</span><span class="p">(</span><span class="n">base_datos</span><span class="o">=</span><span class="n">base_datos</span><span class="p">,</span> <span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">form_twitter</span><span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">form_twitter2</span><span class="o">=</span><span class="n">l2</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje_busqueda</span><span class="o">=</span><span class="n">mensaje</span><span class="p">,</span> <span class="n">tweets</span><span class="o">=</span><span class="n">tweets</span><span class="p">,</span> <span class="n">rt_medio</span><span class="o">=</span><span class="n">rt_medio</span><span class="p">)</span> 
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">twitter</span><span class="p">(</span><span class="n">base_datos</span><span class="o">=</span><span class="n">base_datos</span><span class="p">,</span> <span class="n">formulario</span><span class="o">=</span><span class="n">res</span><span class="p">,</span> <span class="n">form_twitter</span><span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">form_twitter2</span><span class="o">=</span><span class="n">l2</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje_busqueda</span><span class="o">=</span><span class="n">mensaje</span><span class="p">,</span> <span class="n">tweets</span><span class="o">=</span><span class="s">&quot;Error de busqueda&quot;</span><span class="p">,</span> <span class="n">rt_medio</span><span class="o">=</span><span class="n">rt_medio</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">l</span><span class="o">=</span><span class="n">form_log</span><span class="p">()</span>
+            <span class="n">web</span><span class="o">.</span><span class="n">header</span><span class="p">(</span><span class="s">&#39;Content-Type&#39;</span><span class="p">,</span> <span class="s">&#39;text/html; charset=utf-8&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">pagina_desconectado</span><span class="p">(</span><span class="n">formulario</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">mensaje</span><span class="o">=</span><span class="s">&quot;Se ha producido algun error. Inicie sesion de nuevo.&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-29'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-29'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">eventos_twitter</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-30'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-30'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">GET</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="n">l</span> <span class="o">=</span> <span class="n">form_twitter_eventos</span><span class="p">();</span>
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">eventos_twitter</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">tweets</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">,</span> <span class="n">locations</span><span class="o">=</span><span class="s">&quot;&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-31'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-31'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">POST</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">l</span> <span class="o">=</span> <span class="n">form_twitter_eventos</span><span class="p">();</span>
+        <span class="n">locations</span><span class="o">=</span><span class="p">[];</span>
+        <span class="k">if</span> <span class="n">l</span><span class="o">.</span><span class="n">validates</span><span class="p">():</span>
+            <span class="n">tweets</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="n">l</span><span class="o">.</span><span class="n">d</span><span class="o">.</span><span class="n">twitter_palabra</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">tweet</span> <span class="ow">in</span> <span class="n">tweets</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">tweet</span><span class="o">.</span><span class="n">coordinates</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="n">locations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tweet</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="s">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">locations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tweet</span><span class="o">.</span><span class="n">coordinates</span><span class="p">[</span><span class="s">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+            <span class="k">return</span> <span class="n">plantillas</span><span class="o">.</span><span class="n">eventos_twitter</span><span class="p">(</span><span class="n">form</span><span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">render</span><span class="p">(),</span> <span class="n">tweets</span><span class="o">=</span><span class="n">tweets</span><span class="p">,</span> <span class="n">locations</span><span class="o">=</span><span class="n">locations</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">unittest</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-32'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-32'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">class</span> <span class="nc">TestStringMethods</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-33'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-33'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>  <span class="k">def</span> <span class="nf">test_upper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="s">&#39;foo&#39;</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="s">&#39;FOO&#39;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-34'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-34'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>  <span class="k">def</span> <span class="nf">test_isupper</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">assertTrue</span><span class="p">(</span><span class="s">&#39;FOO&#39;</span><span class="o">.</span><span class="n">isupper</span><span class="p">())</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="s">&#39;Foo&#39;</span><span class="o">.</span><span class="n">isupper</span><span class="p">())</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-35'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-35'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>  <span class="k">def</span> <span class="nf">test_split</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+      <span class="n">s</span> <span class="o">=</span> <span class="s">&#39;hello world&#39;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="p">[</span><span class="s">&#39;hello&#39;</span><span class="p">,</span> <span class="s">&#39;world&#39;</span><span class="p">])</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-36'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-36'>#</a>
+      </div>
+      <p>check that s.split fails when the separator is not a string</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>      <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">assertRaises</span><span class="p">(</span><span class="ne">TypeError</span><span class="p">):</span>
+          <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">suite</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestLoader</span><span class="p">()</span><span class="o">.</span><span class="n">loadTestsFromTestCase</span><span class="p">(</span><span class="n">TestStringMethods</span><span class="p">)</span>
+<span class="n">unittest</span><span class="o">.</span><span class="n">TextTestRunner</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">suite</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

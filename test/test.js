@@ -24,13 +24,15 @@ describe('Test basicos', function() {
       done();
     });
 
-    it('Conectado a la base de datos',function(done){
-		db.connect('mongodb://localhost');
-	  	db.dropDb();
-		done();	
-	});
-
   });
 
+    describe('Pruebas con la base de datos', function () {
+       it('Conectado a la base de datos',function(done){
+		db.connect('mongodb://localhost/usuarios');
+	  	db.dropDb();
+		done();	
+	 });
+
+     });
 
 });

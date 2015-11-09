@@ -1,7 +1,7 @@
 # Submódulo de la aplicación "Periódico interactivo"
 
 ![Travis](https://travis-ci.org/enpi/ProjectCC.svg?branch=master)
-![Shippable](https://app.shippable.com/projects/563fafac1895ca447422f73f/badge/master)
+![Shippable](https://img.shields.io/shippable/563fafac1895ca447422f73f.svg)
 
 #Hito 1 - Organización de los grupos de práctica y creación del proyecto
 

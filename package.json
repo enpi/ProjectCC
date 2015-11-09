@@ -1,13 +1,18 @@
 {
-  "name": "ProyectCC-PeriodicoInteractivo",
+  "name": "ProyectCC-PeriodicoInteractivo-GestionBaseDatos",
 
   "version": "0.0.1",
 
   "author": "enpi",
 
-  "description": "Proyecto de MII en Granada: Periódico web interactivo",
+  "description": "Proyecto de MII en Granada: Periódico web interactivo. Submódulo para la gestión de la base de datos.",
 
-  "keywords": ["CC, periodico"],
+  "keywords": ["CC", "periodico", "base de datos"],
+
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:enpi/ProjectCC.git"
+  },
 
   "devDependencies": {
     "chai": "*",

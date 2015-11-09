@@ -28,15 +28,4 @@ describe('Test basicos', function() {
   });
 
 
-  describe('Tests sobre la base de datos', function(){
-	  
-	it('Conectado a la base de datos',function(done){
-		db.connect('mongodb://localhost');
-	  	db.dropDb();
-		done();	
-
-	});
-  });
-
-
 });

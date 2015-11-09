@@ -18,9 +18,16 @@
     "chai": "*",
     "mocha": "*",
     "supertest": "^1.1.0",
-    "mocha-mongoose": "*"
+    "mongodb": ">=1.0.0",
+    "mongoose": ">=3.0.0",
+    "nodemon": "~0"
   },
-
+  "optionalDependencies": {
+  },
+  "engines": {
+    "node": "*",
+    "npm": ">= 1.2"
+  },
   "scripts": {
     "test": "mocha"
   }

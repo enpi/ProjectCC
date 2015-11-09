@@ -3,6 +3,7 @@ var assert = require('assert');
 var chai = require('chai');//Añado mocha
 var expect = chai.expect;
 chai.use(require('chai-fs'));
+
 var dbURI    = 'mongodb://localhost/demo-app-clearing-db'
   , should   = require('chai').should()
   , mongoose = require('mongoose')

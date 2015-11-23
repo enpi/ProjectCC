@@ -2,6 +2,7 @@
 import unittest
 from script import *
 
+# Inserción de un usuario en la base de datos
 def insertarUsuario():
 	post = {"user": "test",
 	    	"nombre": "test_nombre",
@@ -25,11 +26,24 @@ def insertarUsuario():
 	print "Test de inserción en la base de datos"
 	return query.count() == 1
 
-class test (unittest.TestCase):
-	# Inserción de un usuario en la base de datos
-	
-	def test_1(self):
+#Edición de un campo del usuario insertado
+def editarUsuario():
+
+   	posts=db.posts
+        posts.update( { "user": "test" }, { '$set': { "nombre": "test2"}})
+
+	#Comprobamos si realmente se ha actualizado bien la base de datos
+	query=posts.find({"user": "test2"})
+
+	print "Test de edición en la base de datos"
+	return query.count() == 1
+
+class test (unittest.TestCase):	
+	def test_insertar(self):
 		insertarUsuario()
+	
+	def test_editar(self):
+		editarUsuario()
 
 if __name__ == "__main__":
 	unittest.main()

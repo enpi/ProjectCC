@@ -24,7 +24,6 @@ def insertarUsuario():
 	#Comprobamos si realmente se ha insertado en la base de datos
 	query=posts.find({"user": "test"})
 
-	print "Test de inserción en la base de datos"
 	return query.count() != 0
 
 #Edición de un campo del usuario insertado
@@ -36,7 +35,6 @@ def editarUsuario():
 	#Comprobamos si realmente se ha actualizado bien la base de datos
 	query=posts.find({"user": "test"})
 
-	print "Test de edición en la base de datos"
 	return query[0]["nombre"] == "test_nombre2"
 
 #Borrado de un usuario de la base de datos
@@ -47,19 +45,21 @@ def borrarUsuario():
 
 	query=posts.find({"user": "test"})
 
-	print "Test de borrado en la base de datos"
 	return query.count() == 0
 	
 
 class grupoTests(unittest.TestCase):	
 	def test_insertar(self):
+		print "Test de inserción en la base de datos"
 		self.assertTrue(insertarUsuario())
 	
 	def test_editar(self):
+		print "Test de edición en la base de datos"
 		insertarUsuario()
 		self.assertTrue(editarUsuario())
 
 	def test_borrar(self):
+		print "Test de borrado en la base de datos"
 		insertarUsuario()
 		self.assertTrue(borrarUsuario())
 

@@ -17,14 +17,15 @@ def insertarUsuario():
 	    	"visa": "5555-5555-5555-5555",
 	    	}
 
+
 	posts=db.posts
-	post_id = posts.insert(post)    
+	post_id = posts.insert(post) 
 
 	#Comprobamos si realmente se ha insertado en la base de datos
 	query=posts.find({"user": "test"})
 
 	print "Test de inserción en la base de datos"
-	return query.count() == 1
+	return query.count() != 0
 
 #Edición de un campo del usuario insertado
 def editarUsuario():
@@ -42,22 +43,24 @@ def editarUsuario():
 def borrarUsuario():
 	
 	posts=db.posts
-	posts.remove({"user" : "test2"})
+	posts.remove({"user" : "test"})
 
-	query=posts.find({"user": "test2"})
+	query=posts.find({"user": "test"})
 
 	print "Test de borrado en la base de datos"
 	return query.count() == 0
 	
 
-class test (unittest.TestCase):	
+class grupoTests(unittest.TestCase):	
 	def test_insertar(self):
 		self.assertTrue(insertarUsuario())
 	
 	def test_editar(self):
+		insertarUsuario()
 		self.assertTrue(editarUsuario())
 
 	def test_borrar(self):
+		insertarUsuario()
 		self.assertTrue(borrarUsuario())
 
 if __name__ == "__main__":

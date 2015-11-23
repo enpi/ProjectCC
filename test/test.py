@@ -1,11 +1,6 @@
 # encoding: utf-8
 import unittest
-
-import os
-import inspect
-
 from script import *
-
 
 class test (unittest.TestCase):
 	# Inserción de un usuario en la base de datos
@@ -28,6 +23,8 @@ class test (unittest.TestCase):
 
 		#Comprobamos si realmente se ha insertado en la base de datos
 		query=posts.find({"user": "test"})
+
+		print "Test de inserción en la base de datos"
 		return query.count() == 1
 
 

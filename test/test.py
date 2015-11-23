@@ -30,13 +30,13 @@ def insertarUsuario():
 def editarUsuario():
 
    	posts=db.posts
-        posts.update( { "user": "test" }, { '$set': { "nombre": "test2"}})
+        posts.update( { "user": "test" }, { '$set': { "nombre": "test_nombre2"}})
 
 	#Comprobamos si realmente se ha actualizado bien la base de datos
-	query=posts.find({"user": "test2"})
+	query=posts.find({"user": "test"})
 
 	print "Test de edición en la base de datos"
-	return query.count() == 1
+	return query[0]["nombre"] == "test_nombre2"
 
 #Borrado de un usuario de la base de datos
 def borrarUsuario():

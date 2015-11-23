@@ -9,4 +9,4 @@ install: "pip install -r requirements.txt"
 services:
   - mongodb
 
-script: npm install mocha --save-dev; npm install mongoose; npm install mocha-mongoose; npm install chai; npm install chai-fs;npm install supertest;  npm test
+script: npm install mocha --save-dev; npm install mongoose; npm install mocha-mongoose; npm install chai; npm install chai-fs;npm install supertest;  npm test; python test/test.py

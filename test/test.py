@@ -52,13 +52,13 @@ def borrarUsuario():
 
 class test (unittest.TestCase):	
 	def test_insertar(self):
-		insertarUsuario()
+		self.assertTrue(insertarUsuario())
 	
 	def test_editar(self):
-		editarUsuario()
+		self.assertTrue(editarUsuario())
 
 	def test_borrar(self):
-		borrarUsuario()
+		self.assertTrue(borrarUsuario())
 
 if __name__ == "__main__":
 	unittest.main()

@@ -27,7 +27,7 @@ class test (unittest.TestCase):
 		post_id = posts.insert(post)    
 
 		#Comprobamos si realmente se ha insertado en la base de datos
-		query=posts.find({"user": "test")
+		query=posts.find({"user": "test"})
 		return query.count() == 1
 
 

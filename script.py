@@ -463,6 +463,7 @@ class eventos_twitter:
                     locations.append(tweet.coordinates['coordinates'][0])
 
             return plantillas.eventos_twitter(form= l.render(), tweets=tweets, locations=locations)
+'''
 import unittest
 
 class TestStringMethods(unittest.TestCase):
@@ -483,6 +484,7 @@ class TestStringMethods(unittest.TestCase):
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestStringMethods)
 unittest.TextTestRunner(verbosity=2).run(suite)
+'''
 
 if __name__ == "__main__":
     app.run()

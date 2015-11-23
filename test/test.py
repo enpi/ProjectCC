@@ -38,12 +38,27 @@ def editarUsuario():
 	print "Test de edición en la base de datos"
 	return query.count() == 1
 
+#Borrado de un usuario de la base de datos
+def borrarUsuario():
+	
+	posts=db.posts
+	posts.remove({"user" : "test2"})
+
+	query=posts.find({"user": "test2"})
+
+	print "Test de borrado en la base de datos"
+	return query.count() == 0
+	
+
 class test (unittest.TestCase):	
 	def test_insertar(self):
 		insertarUsuario()
 	
 	def test_editar(self):
 		editarUsuario()
+
+	def test_borrar(self):
+		borrarUsuario()
 
 if __name__ == "__main__":
 	unittest.main()

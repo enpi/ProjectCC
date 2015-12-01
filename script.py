@@ -463,27 +463,74 @@ class eventos_twitter:
                     locations.append(tweet.coordinates['coordinates'][0])
 
             return plantillas.eventos_twitter(form= l.render(), tweets=tweets, locations=locations)
+
 '''
 import unittest
 
-class TestStringMethods(unittest.TestCase):
+# Inserción de un usuario en la base de datos
+def insertarUsuario():
+	post = {"user": "test",
+	    	"nombre": "test_nombre",
+	    	"apellidos": "test_appellido",
+	    	"correo": "test@correo.es",
+	    	"dia": "1",
+	    	"mes": "2",
+	    	"anio": "2001",
+		"direccion": "Calle falsa 123",
+	    	"password": "123456",
+	    	"pago": "VISA",
+	    	"visa": "5555-5555-5555-5555",
+	    	}
 
-  def test_upper(self):
-      self.assertEqual('foo'.upper(), 'FOO')
 
-  def test_isupper(self):
-      self.assertTrue('FOO'.isupper())
-      self.assertFalse('Foo'.isupper())
+	posts=db.posts
+	post_id = posts.insert(post) 
 
-  def test_split(self):
-      s = 'hello world'
-      self.assertEqual(s.split(), ['hello', 'world'])
-      # check that s.split fails when the separator is not a string
-      with self.assertRaises(TypeError):
-          s.split(2)
+	#Comprobamos si realmente se ha insertado en la base de datos
+	query=posts.find({"user": "test"})
 
-suite = unittest.TestLoader().loadTestsFromTestCase(TestStringMethods)
+	return query.count() != 0
+
+#Edición de un campo del usuario insertado
+def editarUsuario():
+
+   	posts=db.posts
+        posts.update( { "user": "test" }, { '$set': { "nombre": "test_nombre2"}})
+
+	#Comprobamos si realmente se ha actualizado bien la base de datos
+	query=posts.find({"user": "test"})
+
+	return query[0]["nombre"] == "test_nombre2"
+
+#Borrado de un usuario de la base de datos
+def borrarUsuario():
+	
+	posts=db.posts
+	posts.remove({"user" : "test"})
+
+	query=posts.find({"user": "test"})
+
+	return query.count() == 0
+	
+
+class grupoTests(unittest.TestCase):	
+	def test_insertar(self):
+		print "Test de inserción en la base de datos"
+		self.assertTrue(insertarUsuario())
+	
+	def test_editar(self):
+		print "Test de edición en la base de datos"
+		insertarUsuario()
+		self.assertTrue(editarUsuario())
+
+	def test_borrar(self):
+		print "Test de borrado en la base de datos"
+		insertarUsuario()
+		self.assertTrue(borrarUsuario())
+
+suite = unittest.TestLoader().loadTestsFromTestCase(grupoTests)
 unittest.TextTestRunner(verbosity=2).run(suite)
+
 '''
 
 if __name__ == "__main__":

@@ -101,3 +101,9 @@ services:
 
 Los tests creados permitan comprobar la existencia de determinados ficheros en los directorios y pruebas de conexión a una base de datos de test con inserción, listado y borrado de la misma.
 
+##Tests con Unittest
+
+Se han creado una serie de tests con la base de datos usando el framework para python Unittest. Para ello se ha creado una clase específica en la cual se realizan llamadas a diferentes funciones de inserción, modificación y borrado sobre la base de datos.
+
+Estas funciones de la clase de test han de ser comprobadas con el método: self.assertEqual(response, True) para indicar la respuesta que esperamos a dicho test, para que usando Travis y Shippable nos indique si el test se ha pasado correctamente o no.
+

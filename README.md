@@ -108,3 +108,23 @@ Se han creado una serie de tests con la base de datos usando el framework para p
 
 Estas funciones de la clase de test han de ser comprobadas con el método: self.assertEqual(response, True) para indicar la respuesta que esperamos a dicho test, para que usando Travis y Shippable nos indique si el test se ha pasado correctamente o no.
 
+#Hito 3 - Despliegue de una aplicación en un PaaS
+
+###Heroku
+
+Heroku es una plataforma como servicio ("Platform as a Service" o PaaS) de computación en la nube que soporta distintos lenguajes de programación, python, que es el que usamos, entre ellos.
+
+Plataforma con gran cantidad de características:
+
+* Elasticidad y crecimiento: podemos escalar nuestras aplicaciones en cada momento.
+* Tamaño: ofrece diferentes tipos de "dynos" (unidades que proveen capacidad de cómputo), cada uno con diferentes capacidades de procesamiento y memoria.
+* Routing: internamente los routers realizan un seguimiento de la ubicación de los "Dynos" que estén corriendo, y redirigen el tráfico de acuerdo a la misma.
+* Seguimiento: existe un manejador de "Dynos", el cual monitorea de forma continua los dynos que se estén ejecutando. En caso de fallo en un "Dyno", este es eliminado y creado nuevamente.
+* Distribución y redundancia: los "Dynos" se encuentran aislados uno de otro. Esto implica que de existir fallos en la infraestructura interna de alguno de ellos, los otros dynos no se ven afectados, y consecuentemente tampoco la aplicación.
+
+Activamos en primer lugar en la aplicación de Heroku el estar conectado con Github y una vez dados los permisos nos conectamos con nuestro repositorio.
+Activaremos también la opción de que se espere pasar la integración contínua antes de realizar el despliegue automático en Heroku.
+
+![despliegue_1](https://i.gyazo.com/f8bd5ba322d84cc437e61a30dde30d93.png)
+
+La aplicación desplegada en Heroku se encuentra en el siguiente enlace : [https://projectcc-heroku.herokuapp.com/](https://projectcc-heroku.herokuapp.com/)

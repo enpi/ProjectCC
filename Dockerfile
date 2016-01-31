@@ -4,7 +4,7 @@ MAINTAINER Hans Manuel Grenner Noguerón <juanmagnc@gmail.com>  Version: 1.1
 #Instalar Python con todas las dependencias
 
 RUN apt-get update
-RUN apt-get -y install python python-setuptools mondodb build-essential python-dev
+RUN apt-get -y install python python-setuptools mongodb build-essential python-dev
 RUN apt-get install -y python-setuptools
 RUN easy_install pip
 

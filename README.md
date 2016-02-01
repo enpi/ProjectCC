@@ -143,5 +143,5 @@ Y desplegar :
 
 ```sudo docker run -t -t enpi/projectcc```
 
-Con el contenedor en funcionamiento podemos lanzar la aplicación ```python home/ProjectCC/script.py"```
+Con el contenedor en funcionamiento podemos lanzar la aplicación ```python ProjectCC/script.py"```
 

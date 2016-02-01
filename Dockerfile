@@ -1,5 +1,5 @@
-FROM ubuntu:latest
-MAINTAINER Hans Manuel Grenner Noguerón <juanmagnc@gmail.com>  Version: 1.1
+FROM ubuntu
+MAINTAINER Hans Manuel Grenner Noguerón <juanmagnc@gmail.com>
 
 #Instalar Python con todas las dependencias
 
@@ -18,7 +18,7 @@ RUN \
 
 # Instalamos git y clonamos el repositorio
 
-RUN apt-get install -y git
+RUN apt-get -y install git
 RUN git clone https://github.com/enpi/ProjectCC.git
 
 # Instalamos las dependencias del proyecto

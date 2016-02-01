@@ -4,14 +4,18 @@ MAINTAINER Hans Manuel Grenner Noguerón <juanmagnc@gmail.com>  Version: 1.1
 #Instalar Python con todas las dependencias
 
 RUN apt-get update
-RUN apt-get -y install python python-setuptools mongodb build-essential python-dev
+RUN apt-get -y install python python-setuptools build-essential python-dev
 RUN apt-get install -y python-setuptools
 RUN easy_install pip
+
+# Instalamos MongoDB
+
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv 7F0CEB10
+RUN echo "deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen" | tee -a /etc/apt/sources.list.d/10gen.list
 
 # Instalar wget para descargar y zip para descomprimir
 
 RUN apt-get install -y wget
-
 
 # Instalamos git y clonamos el repositorio
 
@@ -32,4 +36,5 @@ RUN easy_install tweepy
 
 # Lanzamos la aplicación
 
-RUN cd ProjectCC && python script.py
+RUN cd ProjectCC && \
+python script.py

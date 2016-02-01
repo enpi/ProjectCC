@@ -4,7 +4,7 @@
 [![Shippable](https://img.shields.io/shippable/563fafac1895ca447422f73f.svg)](https://app.shippable.com/projects/563fafac1895ca447422f73f)
 [![Heroku](https://heroku-badge.herokuapp.com/?app=projectcc-heroku)](https://projectcc-heroku.herokuapp.com/)
 
-#Hito 1 - Organización de los grupos de práctica y creación del proyecto
+# Organización de los grupos de práctica y creación del proyecto
 
 ## Descripción
 
@@ -40,7 +40,7 @@ A la hora de trabajar con datos es necesario realizar un correcto almacenamiento
 
 Además de desarrollar la aplicación el objetivo principal es crear la infraestructura virtual adecuada cumpliendo con los puntos de aprovisionamiento, integración contínua y despliegue automático. 
 
-#Hito 2 - Infraestructura virtual de un proyecto con integración continua.
+#Infraestructura virtual del proyecto con integración continua.
 
 ##Integración contínua con Shippable
 
@@ -108,7 +108,7 @@ Se han creado una serie de tests con la base de datos usando el framework para p
 
 Estas funciones de la clase de test han de ser comprobadas con el método: self.assertEqual(response, True) para indicar la respuesta que esperamos a dicho test, para que usando Travis y Shippable nos indique si el test se ha pasado correctamente o no.
 
-#Hito 3 - Despliegue de una aplicación en un PaaS
+#Despliegue de la aplicación en un PaaS
 
 ###Heroku
 
@@ -129,6 +129,17 @@ Activaremos también la opción de que se espere pasar la integración contínua
 
 La aplicación desplegada en Heroku se encuentra en el siguiente enlace : [https://projectcc-heroku.herokuapp.com/](https://projectcc-heroku.herokuapp.com/)
 
-###Hito 4 - Entorno de pruebas mediante contenedores Docker
+###Entorno de pruebas mediante contenedores Docker
 
+Docker es un proyecto de software libre que permite automatizar el despliegue de aplicaciones dentro de contenedores. Su principal objetivo es simplificar la infraestructura de las aplicaciones para su despliegue y distribución. En este caso nos permitirá crear un entorno de pruebas para lanzar la aplicación en un entorno seguro igual al de producción.
+
+Para que Docker pueda construir la imagen de forma automática era necesario crear un [Dockerfile](Dockerfile) que aporta las instrucciones requeridas. Además para que tras cada cambio se actualice la imagen en Docker se realizó una conexión con el repositorio. La imagen se puede descargar mediante :
+
+```sudo docker pull enpi/projectcc```
+
+Y desplegar :
+
+```sudo docker run -t -t enpi/projectcc```
+
+Con el contenedor en funcionamiento podemos lanzar la aplicación ```python home/ProjectCC/script.py"```
 

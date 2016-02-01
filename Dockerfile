@@ -16,10 +16,6 @@ RUN \
   apt-get install -y mongodb-org && \
   rm -rf /var/lib/apt/lists/*
 
-# Instalar wget para descargar y zip para descomprimir
-
-RUN apt-get install -y wget
-
 # Instalamos git y clonamos el repositorio
 
 RUN apt-get install -y git

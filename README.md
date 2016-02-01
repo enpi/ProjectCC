@@ -131,6 +131,8 @@ La aplicación desplegada en Heroku se encuentra en el siguiente enlace : [https
 
 ###Entorno de pruebas mediante contenedores Docker
 
+![docker](https://upload.wikimedia.org/wikipedia/commons/7/79/Docker_(container_engine)_logo.png)
+
 Docker es un proyecto de software libre que permite automatizar el despliegue de aplicaciones dentro de contenedores. Su principal objetivo es simplificar la infraestructura de las aplicaciones para su despliegue y distribución. En este caso nos permitirá crear un entorno de pruebas para lanzar la aplicación en un entorno seguro igual al de producción.
 
 Para que Docker pueda construir la imagen de forma automática era necesario crear un [Dockerfile](Dockerfile) que aporta las instrucciones requeridas. Además para que tras cada cambio se actualice la imagen en Docker se realizó una conexión con el repositorio. La imagen se puede descargar mediante :

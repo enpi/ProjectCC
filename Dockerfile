@@ -25,11 +25,7 @@ RUN git clone https://github.com/enpi/ProjectCC.git
 RUN easy_install web.py
 RUN easy_install mako
 RUN easy_install pymongo
-RUN wget https://pypi.python.org/packages/source/f/feedparser/feedparser-5.2.1.tar.gz#md5=d552f7a2a55e8e33b2a3fe1082505b42 && \ 
-tar -xvzf feedparser-5.2.1.tar.gz && \
-cd feedparser-5.2.1 && \
-python setup.py install && \
-cd ..
+RUN easy_install feedparser
 RUN easy_install tweepy
 
 # Lanzamos la aplicación

@@ -128,3 +128,7 @@ Activaremos también la opción de que se espere pasar la integración contínua
 ![despliegue_1](https://i.gyazo.com/f8bd5ba322d84cc437e61a30dde30d93.png)
 
 La aplicación desplegada en Heroku se encuentra en el siguiente enlace : [https://projectcc-heroku.herokuapp.com/](https://projectcc-heroku.herokuapp.com/)
+
+###Hito 4 - Entorno de pruebas mediante contenedores Docker
+
+
